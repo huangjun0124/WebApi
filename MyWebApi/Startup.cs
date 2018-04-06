@@ -8,11 +8,13 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
+using MyWebApi.Model;
 using NJsonSchema;
 using NSwag.AspNetCore;
 
@@ -39,6 +41,13 @@ namespace MyWebApi
             
             services.AddSingleton<IBackgroundJobClient>(new BackgroundJobClient(
                 new SqlServerStorage(sConnectionString)));
+
+            services.AddDbContext<MyWebApiDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("MyWebApi")));
+
+            services.AddTransient<IMailListRepository, MailListRepoUsingDB>();
+            services.AddTransient<ISendMessage, SendMesageByMail>();
+            services.AddTransient<IMyDictionary, MyDictionaryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
