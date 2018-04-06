@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,9 @@ namespace MyWebApi
             string sConnectionString = Configuration.GetConnectionString("hangfiredb");
             services.AddHangfire(x => x.UseSqlServerStorage(sConnectionString));
             services.AddMvc();
+            
+            services.AddSingleton<IBackgroundJobClient>(new BackgroundJobClient(
+                new SqlServerStorage(sConnectionString)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
